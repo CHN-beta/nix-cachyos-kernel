@@ -51,9 +51,7 @@ lib.makeOverridable (
       ]
       ++ patches;
       postPatch = ''
-        for DIR in arch/*/configs; do
-          install -Dm644 ${cachyosConfigFile} $DIR/cachyos_defconfig
-        done
+        install -Dm644 ${cachyosConfigFile} arch/x86/configs/cachyos_defconfig
       ''
       + postPatch;
       dontConfigure = true;
@@ -112,6 +110,7 @@ lib.makeOverridable (
 
       extraMeta = {
         description = "Linux CachyOS Kernel" + lib.optionalString lto " with Clang+ThinLTO";
+        broken = !stdenv.isx86_64;
       }
       // (args.extraMeta or { });
 

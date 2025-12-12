@@ -10,11 +10,6 @@ This repo provides the latest kernel version and the latest LTS kernel version:
 
 ```bash
 └───packages
-    ├───aarch64-linux
-        ├───linux-cachyos-latest
-        ├───linux-cachyos-latest-lto
-        ├───linux-cachyos-lts
-        └───linux-cachyos-lts-lto
     └───x86_64-linux
         ├───linux-cachyos-latest
         ├───linux-cachyos-latest-lto
