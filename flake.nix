@@ -78,7 +78,7 @@
         flake = {
           overlay = self.overlays.default;
           overlays.default = final: prev: {
-            cachyosKernels = loadPackages prev;
+            cachyosKernels = loadPackages final;
           };
 
           # Example configurations for testing CachyOS kernel
