@@ -80,7 +80,7 @@
         flake = {
           overlay = self.overlays.default;
           overlays.default = final: prev: {
-            cachyosKernels = loadPackages prev;
+            cachyosKernels = loadPackages final;
           };
           overlays.pinned = final: prev: {
             cachyosKernels = self.legacyPackages."${final.stdenv.hostPlatform.system}";
