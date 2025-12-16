@@ -1,8 +1,10 @@
 # Nix packages for CachyOS Kernel
 
+This repo contains Linux kernels with both [CachyOS patches](https://github.com/CachyOS/kernel-patches) and [CachyOS tunings](https://github.com/CachyOS/linux-cachyos), as well as [CachyOS-patched ZFS module](https://github.com/CachyOS/zfs).
+
 [![built with garnix](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Fxddxdd%2Fnix-cachyos-kernel)](https://garnix.io/repo/xddxdd/nix-cachyos-kernel)
 
-This repo contains Linux kernels with both [CachyOS patches](https://github.com/CachyOS/kernel-patches) and [CachyOS tunings](https://github.com/CachyOS/linux-cachyos), as well as [CachyOS-patched ZFS module](https://github.com/CachyOS/zfs).
+> Note: If you see "all builds failed" from Garnix, it means I ran out of free plan's build time. I also have [my own Hydra CI](https://hydra.lantian.pub/jobset/lantian/nix-cachyos-kernel) that's building the kernels.
 
 ## Which kernel versions are provided?
 
