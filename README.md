@@ -1,12 +1,14 @@
 # Nix packages for CachyOS Kernel
 
+This repo contains Linux kernels with both [CachyOS patches](https://github.com/CachyOS/kernel-patches) and [CachyOS tunings](https://github.com/CachyOS/linux-cachyos), as well as [CachyOS-patched ZFS module](https://github.com/CachyOS/zfs).
+
 [![built with garnix](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Fxddxdd%2Fnix-cachyos-kernel)](https://garnix.io/repo/xddxdd/nix-cachyos-kernel)
 
-This repo contains Linux kernels with both [CachyOS patches](https://github.com/CachyOS/kernel-patches) and [CachyOS tunings](https://github.com/CachyOS/linux-cachyos), as well as [CachyOS-patched ZFS module](https://github.com/CachyOS/zfs).
+> Note: If you see "all builds failed" from Garnix, it means I ran out of free plan's build time. I also have [my own Hydra CI](https://hydra.lantian.pub/jobset/lantian/nix-cachyos-kernel) that's building the kernels.
 
 ## Which kernel versions are provided?
 
-This repo provides the latest kernel version and the latest LTS kernel version:
+This repo provides the following kernel variants, consistent with the [upstream definitions](https://github.com/CachyOS/linux-cachyos?tab=readme-ov-file#kernel-variants--schedulers):
 
 ```bash
 └───packages
@@ -14,7 +16,7 @@ This repo provides the latest kernel version and the latest LTS kernel version:
         ├───linux-cachyos-latest
         ├───linux-cachyos-latest-lto
         ├───linux-cachyos-lts
-        └───linux-cachyos-lts-lto
+        ├───linux-cachyos-lts-lto
         # Additional CachyOS kernel variants
         ├───linux-cachyos-bmq
         ├───linux-cachyos-bmq-lto
@@ -29,7 +31,7 @@ This repo provides the latest kernel version and the latest LTS kernel version:
         ├───linux-cachyos-rt-bore
         ├───linux-cachyos-rt-bore-lto
         ├───linux-cachyos-server
-        ├───linux-cachyos-server-lto
+        └───linux-cachyos-server-lto
 ```
 
 The kernel versions are automatically kept in sync with Nixpkgs, so once the latest/LTS kernel is updated in Nixpkgs, CachyOS kernels in this repo will automatically catch up.
@@ -59,6 +61,29 @@ Add the repo's overlay in your NixOS configuration, this will expose the package
 
 Then specify `pkgs.cachyosKernels.linuxPackages-cachyos-latest` (or other variants you'd like) in your `boot.kernelPackages` option.
 
+
+### Binary cache
+
+I'm running a Hydra CI to build the kernels and push them to my Attic binary cache. You can see the build status here: <https://hydra.lantian.pub/jobset/lantian/nix-cachyos-kernel>
+
+To use my binary cache, please add the following config:
+
+```nix
+{
+  nix.settings.substituters = [ "https://attic.xuyh0120.win/lantian" ];
+  nix.settings.trusted-public-keys = [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
+}
+```
+
+This repo also has [Garnix CI](https://garnix.io) set up, and should work as long as the total build time is below the free plan threshold:
+
+```nix
+{
+  nix.settings.substituters = [ "https://cache.garnix.io" ];
+  nix.settings.trusted-public-keys = [ "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g=" ];
+}
+```
+
 ### Example configuration
 
 ```nix
@@ -71,6 +96,11 @@ Then specify `pkgs.cachyosKernels.linuxPackages-cachyos-latest` (or other varian
         {
           nixpkgs.overlays = [ self.overlay ];
           boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest;
+
+          # Binary cache
+          nix.settings.substituters = [ "https://attic.xuyh0120.win/lantian" ];
+          nix.settings.trusted-public-keys = [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
+
           # ... your other configs
         }
       )
@@ -78,7 +108,6 @@ Then specify `pkgs.cachyosKernels.linuxPackages-cachyos-latest` (or other varian
   };
 }
 ```
-
 ### Help! My kernel is failing to build!
 
 In most cases, failing to build a kernel is caused by CachyOS not updating patches for the latest kernel version. (e.g. hardened 6.18 kernel as of 2025-12-12)
