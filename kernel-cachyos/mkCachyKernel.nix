@@ -5,6 +5,7 @@
   buildLinux,
   stdenv,
   kernelPatches,
+  applyPatches,
   ...
 }:
 lib.makeOverridable (
@@ -74,9 +75,9 @@ lib.makeOverridable (
     );
 
     # buildLinux doesn't accept postPatch, so adding config file early here
-    patchedSrc = stdenv.mkDerivation {
-      pname = "${pname}-src";
-      inherit version src prePatch;
+    patchedSrc = applyPatches {
+      name = "linux-src-patched";
+      inherit src;
       patches = [
         kernelPatches.bridge_stp_helper.patch
         kernelPatches.request_key_helper.patch
@@ -87,13 +88,6 @@ lib.makeOverridable (
         install -Dm644 ${cachyosConfigFile} arch/x86/configs/cachyos_defconfig
       ''
       + postPatch;
-      dontConfigure = true;
-      dontBuild = true;
-      dontFixup = true;
-      installPhase = ''
-        mkdir -p $out
-        cp -r * $out/
-      '';
     };
 
     defaultLocalVersion = if lto == "none" then "-cachyos" else "-cachyos-lto";
