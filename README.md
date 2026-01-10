@@ -172,7 +172,7 @@ Common symptoms are:
 - "File not found" error, which indicates that CachyOS patches for given kernel version/variant are unavailable.
 - Failures/conflicts when applying patches, which indicates that CachyOS patches are for an older kernel version.
 
-If this is the case, the only option is to wait for the versions to be in sync again.
+If this is the case, the build will be automatically fixed once versions to be in sync again.
 
 ## How to use ZFS modules
 
