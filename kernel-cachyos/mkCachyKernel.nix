@@ -6,6 +6,7 @@
   stdenv,
   kernelPatches,
   applyPatches,
+  impureUseNativeOptimizations,
   ...
 }:
 lib.makeOverridable (
@@ -47,6 +48,14 @@ lib.makeOverridable (
     acpiCall ? false,
     handheld ? false,
 
+    # AutoFDO settings
+    # AutoFDO hasn't been fully tested. Please report issue if you encounter any.
+    #
+    # false - Disable AutoFDO
+    # true - Enable AutoFDO for profiling performance patterns only
+    # ./path/to/autofdo/profile: Enable AutoFDO with specified profile
+    autofdo ? false,
+
     # Build as much components as possible as kernel modules, including disabled ones.
     # This can enable unexpected modules, such as nova_core.
     # https://github.com/xddxdd/nix-cachyos-kernel/issues/13
@@ -58,6 +67,10 @@ lib.makeOverridable (
     # Additional args are passed to buildLinux.
     ...
   }@args:
+
+  # AutoFDO requires Clang compiler
+  assert autofdo != false -> lto != "none";
+
   let
     helpers = callPackage ../helpers.nix { };
     inherit (helpers) stdenvLLVM ltoMakeflags;
@@ -128,6 +141,9 @@ lib.makeOverridable (
         // (lib.optionalAttrs bbr3 cachySettings.bbr3)
         // (lib.optionalAttrs (hugepage != null) cachySettings.hugepage."${hugepage}")
         // (lib.optionalAttrs (processorOpt != null) cachySettings.processorOpt.${processorOpt})
+        // (lib.optionalAttrs (autofdo != false) {
+          AUTOFDO_CLANG = lib.kernel.yes;
+        })
       ))
 
       # Apply user custom settings
@@ -147,9 +163,19 @@ lib.makeOverridable (
     // {
       inherit pname version;
       src = patchedSrc;
-      stdenv = args.stdenv or (if lto == "none" then stdenv else stdenvLLVM);
 
-      extraMakeFlags = (lib.optionals (lto != "none") ltoMakeflags) ++ (args.extraMakeFlags or [ ]);
+      stdenv =
+        # Apply native optimization on top of stdenv if requested
+        (if processorOpt == "native" then impureUseNativeOptimizations else lib.id)
+          # Select stdenv/stdenvLLVM based on requested compiler
+          (args.stdenv or (if lto == "none" then stdenv else stdenvLLVM));
+
+      extraMakeFlags =
+        (lib.optionals (lto != "none") ltoMakeflags)
+        ++ lib.optionals (builtins.isPath autofdo) [
+          "CLANG_AUTOFDO_PROFILE=${autofdo}"
+        ]
+        ++ (args.extraMakeFlags or [ ]);
 
       defconfig = args.defconfig or "cachyos_defconfig";
 
