@@ -48,7 +48,7 @@ This repo provides the following kernel variants, consistent with the [upstream 
 
 The kernel versions are automatically kept in sync with Nixpkgs, so once the latest/LTS kernel is updated in Nixpkgs, CachyOS kernels in this repo will automatically catch up.
 
-Use `nix flake show github:xddxdd/nix-cachyos-kernel` to see the current effective versions.
+Use `nix flake show github:xddxdd/nix-cachyos-kernel/release` to see the current effective versions.
 
 The kernels ending in `-lto` has Clang+ThinLTO enabled.
 
@@ -65,6 +65,7 @@ Add the `release` branch this repo to the inputs section of your `flake.nix`:
 {
   inputs = {
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
+    # Do not override its nixpkgs input, otherwise there can be mismatch between patches and kernel version
   }
 }
 ```
@@ -93,13 +94,13 @@ Add the repo's overlay in your NixOS configuration, this will expose the package
           { pkgs, ... }:
           {
             nixpkgs.overlays = [
-              # Build the kernels on top of nixpkgs version in your flake.
-              # Binary cache may be unavailable for the kernel/nixpkgs version combos.
-              nix-cachyos-kernel.overlays.default
-
-              # Alternatively: use the exact kernel versions as defined in this repo.
+              # Use the exact kernel versions as defined in this repo.
               # Guarantees you have binary cache.
               nix-cachyos-kernel.overlays.pinned
+
+              # Alternatively, build the kernels on top of nixpkgs version in your flake.
+              # This might cause version mismatch/build failures!
+              nix-cachyos-kernel.overlays.default
 
               # Only use one of the two overlays!
             ];
