@@ -151,7 +151,7 @@
                         hardware.graphics.enable = true;
                         services.xserver.videoDrivers = [ "nvidia" ];
                         hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
-                        hardware.nvidia.open = false;
+                        hardware.nvidia.open = true;
 
                         # ZFS test
                         boot.supportedFilesystems.zfs = true;
