@@ -17,6 +17,18 @@
       flake = false;
     };
   };
+
+  nixConfig = {
+    extra-substituters = [
+      "https://attic.xuyh0120.win/lantian"
+      "https://cache.garnix.io"
+    ];
+    extra-trusted-public-keys = [
+      "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
+      "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
+    ];
+  };
+
   outputs =
     { self, flake-parts, ... }@inputs:
     flake-parts.lib.mkFlake { inherit inputs; } (
@@ -67,6 +79,25 @@
 
             # Packages only contain linux-cachyos-* due to Flake schema requirements
             packages = lib.filterAttrs (_: lib.isDerivation) legacyPackages;
+
+            apps.update-zfs-cachyos = {
+              type = "app";
+              program =
+                let
+                  python = pkgs.python3.withPackages (ps: [ ps.requests ]);
+                  script = pkgs.writeShellApplication {
+                    name = "update-zfs-cachyos";
+                    runtimeInputs = [
+                      python
+                      pkgs.nix-prefetch-git
+                    ];
+                    text = ''
+                      python3 ${./zfs-cachyos/update.py}
+                    '';
+                  };
+                in
+                lib.getExe script;
+            };
 
             # Allow build unfree modules such as nvidia_x11
             _module.args.pkgs = lib.mkForce (
@@ -127,6 +158,12 @@
                       {
                         nixpkgs.overlays = [ self.overlays.pinned ];
                         boot.kernelPackages = pkgs.cachyosKernels."${kernelPackageName}";
+
+                        # NVIDIA test
+                        hardware.graphics.enable = true;
+                        services.xserver.videoDrivers = [ "nvidia" ];
+                        hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
+                        hardware.nvidia.open = true;
 
                         # ZFS test
                         boot.supportedFilesystems.zfs = true;
