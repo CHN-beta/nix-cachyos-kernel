@@ -80,47 +80,54 @@
             # Packages only contain linux-cachyos-* due to Flake schema requirements
             packages = lib.filterAttrs (_: lib.isDerivation) legacyPackages;
 
-            apps.update-zfs-cachyos = {
-              type = "app";
-              program =
-                let
-                  python = pkgs.python3.withPackages (ps: [ ps.requests ]);
-                  script = pkgs.writeShellApplication {
-                    name = "update-zfs-cachyos";
-                    runtimeInputs = [
-                      python
-                      pkgs.nix-prefetch-git
-                    ];
-                    text = ''
-                      python3 ${./zfs-cachyos/update.py}
-                    '';
-                  };
-                in
-                lib.getExe script;
-            };
+            apps =
+              let
+                mkApp = name: script: {
+                  type = "app";
+                  program =
+                    let
+                      python = pkgs.python3.withPackages (ps: [ ps.requests ]);
+                      app = pkgs.writeShellApplication {
+                        inherit name;
+                        runtimeInputs = [
+                          python
+                          pkgs.nix-prefetch-git
+                        ];
+                        text = ''
+                          python3 ${script}
+                        '';
+                      };
+                    in
+                    lib.getExe app;
+                };
+              in
+              {
+                update-kernel-cachyos = mkApp "update-lernel-cachyos" ./kernel-cachyos/update.py;
+                update-zfs-cachyos = mkApp "update-zfs-cachyos" ./zfs-cachyos/update.py;
+              };
 
             # Allow build unfree modules such as nvidia_x11
             _module.args.pkgs = lib.mkForce (
               import inputs.nixpkgs {
                 inherit system;
-                config.allowUnfree = true;
+                config = {
+                  allowUnfree = true;
+                  allowInsecurePredicate = _: true;
+                };
               }
             );
           };
 
         flake = {
           overlay = self.overlays.pinned;
-          overlays.default =
-            lib.warn
-              "\"nix-cachyos-kernel.overlays.default\" may cause kernel/patch version mismatch and build failure. Please use \"nix-cachyos-kernel.overlays.pinned\" instead."
-              (
-                final: prev: {
-                  cachyosKernels = loadPackages final;
-                }
-              );
+          overlays.default = final: prev: {
+            cachyosKernels = loadPackages final;
+          };
           overlays.pinned = final: prev: {
             cachyosKernels = self.legacyPackages."${final.stdenv.hostPlatform.system}";
           };
+
+          cachyos-kernel-input-path = inputs.cachyos-kernel.outPath;
 
           mkCachyKernel =
             { buildLinux, pkgs, ... }@args:

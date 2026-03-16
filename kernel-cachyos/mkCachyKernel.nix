@@ -31,7 +31,7 @@ lib.makeOverridable (
     # CachyOS fine tuning settings, see ./cachySettings.nix for corresponding options
     # Default value sourced from https://github.com/CachyOS/linux-cachyos/blob/master/linux-cachyos/PKGBUILD
     # Set to null or false to disable
-    cpusched ? "bore",
+    cpusched ? "eevdf",
     kcfi ? false,
     hzTicks ? "1000",
     performanceGovernor ? false,
@@ -83,8 +83,7 @@ lib.makeOverridable (
 
     cachyosConfigFile = "${inputs.cachyos-kernel.outPath}/${configVariant}/config";
     cachyosPatches = builtins.map (p: "${inputs.cachyos-kernel-patches.outPath}/${patchVersion}/${p}") (
-      [ "all/0001-cachyos-base-all.patch" ]
-      ++ (lib.optional (cpusched == "bore") "sched/0001-bore-cachy.patch")
+      (lib.optional (cpusched == "bore") "sched/0001-bore-cachy.patch")
       ++ (lib.optional (cpusched == "bmq") "sched/0001-prjc-cachy.patch")
       ++ (lib.optional hardened "misc/0001-hardened.patch")
       ++ (lib.optional rt "misc/0001-rt-i915.patch")
@@ -125,6 +124,9 @@ lib.makeOverridable (
         OVERLAY_FS_XINO_AUTO = no;
         OVERLAY_FS_METACOPY = no;
         OVERLAY_FS_DEBUG = no;
+
+        # Fix HID_HAPTIC linking error
+        HID = yes;
       })
 
       # Apply CachyOS specific settings
@@ -143,6 +145,15 @@ lib.makeOverridable (
         // (lib.optionalAttrs (processorOpt != null) cachySettings.processorOpt.${processorOpt})
         // (lib.optionalAttrs (autofdo != false) {
           AUTOFDO_CLANG = lib.kernel.yes;
+        })
+        // (lib.optionalAttrs (hardened != false) {
+          # required because hardened kernels use the latent entropy gcc plugin
+          # which the rust bindgen currently doesn't support. They're waiting on
+          # this patch to be merged:
+          # https://lore.kernel.org/all/20251221081659.1742800-1-stijn@linux-ipv6.be/
+          # from what I can see, this still hasn't been merged into 7.0, so may
+          # be a bit
+          RUST = lib.kernel.no;
         })
       ))
 
