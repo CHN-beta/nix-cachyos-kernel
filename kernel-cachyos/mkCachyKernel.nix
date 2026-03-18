@@ -70,6 +70,8 @@ lib.makeOverridable (
 
   # AutoFDO requires Clang compiler
   assert autofdo != false -> lto != "none";
+  # rt/rt-bore cpusched requires realtime patchset
+  assert cpusched == "rt" || cpusched == "rt-bore" -> rt;
 
   let
     helpers = callPackage ../helpers.nix { };
