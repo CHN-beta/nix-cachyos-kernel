@@ -150,6 +150,8 @@ To manually use my binary cache, please add the following config:
 }
 ```
 
+**Important:** As with all binary caches, after adding binary cache to your NixOS configuration, please apply your settings once before enabling CachyOS kernel, so that the binary cache settings can take effect.
+
 This repo also has [Garnix CI](https://garnix.io) set up, and should work as long as the total build time is below the free plan threshold.
 
 [![built with garnix](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Fxddxdd%2Fnix-cachyos-kernel)](https://garnix.io/repo/xddxdd/nix-cachyos-kernel)
@@ -164,6 +166,8 @@ To manually use it:
   nix.settings.trusted-public-keys = [ "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g=" ];
 }
 ```
+
+**Important:** As with all binary caches, after adding binary cache to your NixOS configuration, please apply your settings once before enabling CachyOS kernel, so that the binary cache settings can take effect.
 
 ### Example configuration
 
@@ -297,7 +301,7 @@ The following arguments can be passed to `mkCachyKernel`:
 
 **CachyOS Fine Tuning Settings:**
 
-- **`cpusched`**: CPU scheduler. Options: `"eevdf"` (default), `"bore"`, `"bmq"`, `"hardened"`, `"rt"`, `"rt-bore"` or `null` to disable.
+- **`cpusched`**: CPU scheduler. Options: `"eevdf"` (default), `"bore"`, `"bmq"`, `"rt"`, `"rt-bore"` or `null` to disable.
 - **`kcfi`**: Enable Kernel Control Flow Integrity. Default: `false`.
 - **`hzTicks`**: Timer frequency. Options: `"1000"` (default), `"250"`, `"300"`, `"500"`, `"750"`, or `null` to disable.
 - **`performanceGovernor`**: Enable performance governor. Default: `false`.

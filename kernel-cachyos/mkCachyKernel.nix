@@ -70,6 +70,8 @@ lib.makeOverridable (
 
   # AutoFDO requires Clang compiler
   assert autofdo != false -> lto != "none";
+  # rt/rt-bore cpusched requires realtime patchset
+  assert cpusched == "rt" || cpusched == "rt-bore" -> rt;
 
   let
     helpers = callPackage ../helpers.nix { };
@@ -83,7 +85,7 @@ lib.makeOverridable (
 
     cachyosConfigFile = "${inputs.cachyos-kernel.outPath}/${configVariant}/config";
     cachyosPatches = builtins.map (p: "${inputs.cachyos-kernel-patches.outPath}/${patchVersion}/${p}") (
-      (lib.optional (cpusched == "bore") "sched/0001-bore-cachy.patch")
+      (lib.optional (cpusched == "bore" || cpusched == "rt-bore") "sched/0001-bore-cachy.patch")
       ++ (lib.optional (cpusched == "bmq") "sched/0001-prjc-cachy.patch")
       ++ (lib.optional hardened "misc/0001-hardened.patch")
       ++ (lib.optional rt "misc/0001-rt-i915.patch")
@@ -208,6 +210,7 @@ lib.makeOverridable (
 
       extraPassthru = {
         inherit cachyosConfigFile cachyosPatches;
+        cachyosConfigVariant = configVariant;
       }
       // (args.extraPassthru or { });
     }

@@ -1,15 +1,26 @@
 {
-  "zfs_branch": "zfs-2.4.1-cachyos",
-  "url": "https://github.com/CachyOS/zfs.git",
-  "rev": "1c702dda346a59e05cfd3029569bbb1d5d91c54b",
-  "date": "2026-02-19T11:14:37-08:00",
-  "path": "/nix/store/vqlwpb40ybzrhwqqqz6dfih5vj0anrmy-zfs",
-  "sha256": "0n7m1m0spywqnvsyga78mv6lng20ga8h34qf3dq3hfjmygc4ral1",
-  "hash": "sha256-gapM2PNVOjhwGw6TAZF6QDxLza7oqOf1tpj7q0EN9Vg=",
-  "fetchLFS": false,
-  "fetchSubmodules": false,
-  "deepClone": false,
-  "fetchTags": false,
-  "leaveDotGit": false,
-  "rootDir": ""
+  "latest": {
+    "commit": "0829cf892b5d7b3a0e8aa76cc7aca02b84f62557",
+    "version": "2.4.1",
+    "url": "https://github.com/CachyOS/zfs/archive/0829cf892b5d7b3a0e8aa76cc7aca02b84f62557.tar.gz",
+    "hash": "sha256-39nZNnXeGrUhyt7Qa8hkQusLepAfctsBLRbMcENVrvU="
+  },
+  "lts": {
+    "commit": "1c702dda346a59e05cfd3029569bbb1d5d91c54b",
+    "version": "2.4.1",
+    "url": "https://github.com/CachyOS/zfs/archive/1c702dda346a59e05cfd3029569bbb1d5d91c54b.tar.gz",
+    "hash": "sha256-wu+yhK06AAVEvaTmnh3OvGKi1mi3LIR9FqS9Fa1/k9w="
+  },
+  "rc": {
+    "commit": "0829cf892b5d7b3a0e8aa76cc7aca02b84f62557",
+    "version": "2.4.1",
+    "url": "https://github.com/CachyOS/zfs/archive/0829cf892b5d7b3a0e8aa76cc7aca02b84f62557.tar.gz",
+    "hash": "sha256-39nZNnXeGrUhyt7Qa8hkQusLepAfctsBLRbMcENVrvU="
+  },
+  "hardened": {
+    "commit": "1c702dda346a59e05cfd3029569bbb1d5d91c54b",
+    "version": "2.4.1",
+    "url": "https://github.com/CachyOS/zfs/archive/1c702dda346a59e05cfd3029569bbb1d5d91c54b.tar.gz",
+    "hash": "sha256-wu+yhK06AAVEvaTmnh3OvGKi1mi3LIR9FqS9Fa1/k9w="
+  }
 }

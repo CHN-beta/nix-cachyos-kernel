@@ -231,14 +231,14 @@ builtins.listToAttrs (
       inherit (linuxSources.latest) version src;
       configVariant = "linux-cachyos-rt-bore";
       rt = true;
-      cpusched = "bore";
+      cpusched = "rt-bore";
     })
     (mkCachyKernel {
       pname = "linux-cachyos-rt-bore-lto";
       inherit (linuxSources.latest) version src;
       configVariant = "linux-cachyos-rt-bore";
       rt = true;
-      cpusched = "bore";
+      cpusched = "rt-bore";
       lto = "thin";
     })
     (mkCachyKernel {
